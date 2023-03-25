@@ -4,3 +4,5 @@ https://learn.unity.com/tutorial/unit-3-introduction?uv=2021.3&pathwayId=5f7e17e
 
 This is a project from official Unily course in pathway "Junior Programmer".
 It is basically a running guy that can jump over obstacles. It features sounds and particle effects.
+
+Also, there is a challenge task to test the skills gained making this project, and right now I am working on some bonus features in the main project.
