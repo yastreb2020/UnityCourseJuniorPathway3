@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     public float jumpForce;
     public float gravityModifier;
     public bool isOnGround = true;
+    private bool doubleJump = true;
     public bool gameOver = false;
 
     void Start()
@@ -27,10 +28,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isOnGround && !gameOver)
+        if (Input.GetKeyDown(KeyCode.Space) && (isOnGround || doubleJump) && !gameOver)
         {
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isOnGround = false;
+            if (!isOnGround) doubleJump = false;
+            else isOnGround = false;
             playerAnim.SetTrigger("Jump_trig");
             dirtParticle.Stop();
             playerAudio.PlayOneShot(jumpSound);
@@ -41,9 +43,10 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground")) {
             isOnGround = true;
+            doubleJump = true;
             if (!gameOver)
                 dirtParticle.Play();
-        } else if (collision.gameObject.CompareTag("Obstacle")) {
+        } else if (collision.gameObject.CompareTag("Obstacle") && !gameOver) { // second clause makes sure we can't die twice
             Debug.Log("Game Over");
             gameOver = true;
             playerAnim.SetBool("Death_b", true);
