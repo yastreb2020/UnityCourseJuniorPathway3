@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     public bool isOnGround = true;
     private bool doubleJump = true;
     public bool gameOver = false;
+    private int score;
+    public bool dashMode = false;
+    private int scoreStep = 1;
 
     void Start()
     {
@@ -24,18 +27,45 @@ public class PlayerController : MonoBehaviour
         playerAudio = GetComponent<AudioSource>();
         Physics.gravity *= gravityModifier;
         gameOver = false;
+        score = 0;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && (isOnGround || doubleJump) && !gameOver)
+        if (!gameOver)
         {
-            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            if (!isOnGround) doubleJump = false;
-            else isOnGround = false;
-            playerAnim.SetTrigger("Jump_trig");
-            dirtParticle.Stop();
-            playerAudio.PlayOneShot(jumpSound);
+            score += scoreStep;
+            Debug.Log("Score: " + score);
+
+            if (Input.GetKeyDown(KeyCode.Space) && (isOnGround || doubleJump))
+            {
+                playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                if (!isOnGround) // means it's a double jump
+                {
+                    doubleJump = false;
+                    playerAnim.Play("Running_Jump"); // animation of second jump must start immediately
+                }
+                else
+                {
+                    isOnGround = false;
+                    playerAnim.SetTrigger("Jump_trig");
+                    dirtParticle.Stop();
+                }
+                playerAudio.PlayOneShot(jumpSound);
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                dashMode = true;
+                playerAnim.speed = 1.5f;
+                scoreStep = 2;
+            }
+            else
+            {
+                dashMode = false;
+                playerAnim.speed = 1;
+                scoreStep = 1;
+            }
         }
     }
 
@@ -48,6 +78,7 @@ public class PlayerController : MonoBehaviour
                 dirtParticle.Play();
         } else if (collision.gameObject.CompareTag("Obstacle") && !gameOver) { // second clause makes sure we can't die twice
             Debug.Log("Game Over");
+            Debug.Log("Score: " + score);
             gameOver = true;
             playerAnim.SetBool("Death_b", true);
             playerAnim.SetInteger("DeathType_int", 1);
