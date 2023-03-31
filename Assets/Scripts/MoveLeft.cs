@@ -18,6 +18,18 @@ public class MoveLeft : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!(playerControllerScript.transform.position.x < 0)) //if not initial animation
+        {
+            CheckDashMode();
+
+            CheckGameOver();
+
+            CheckOutOfBounds();
+        }
+    }
+
+    private void CheckDashMode()
+    {
         if (playerControllerScript.dashMode)
         {
             speed = normalSpeed * 2;
@@ -26,11 +38,18 @@ public class MoveLeft : MonoBehaviour
         {
             speed = normalSpeed;
         }
-        //Debug.Log(playerControllerScript.gameOver);
+    }
+
+    private void CheckGameOver()
+    {
         if (!playerControllerScript.gameOver)
         {
             transform.Translate(Vector3.left * Time.deltaTime * speed);
         }
+    }
+
+    private void CheckOutOfBounds()
+    {
         if (gameObject.transform.position.x < leftBound /*&& gameObject.CompareTag("Obstacle")*/)
         {
             Destroy(gameObject);
